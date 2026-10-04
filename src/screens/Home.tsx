@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Family } from '../ui/data';
 import { ChildCard } from '../ui/ChildCard';
 import { AwardSheet } from '../ui/AwardSheet';
+import { BackupReminder } from '../ui/BackupReminder';
 
 export function Home({ family }: { family: Family }) {
   const [awardFor, setAwardFor] = useState<string | null>(null);
@@ -15,6 +16,7 @@ export function Home({ family }: { family: Family }) {
           <ChildCard key={c.id} child={c} balance={family.balances[c.id] ?? 0} rewards={family.rewards} onAward={() => setAwardFor(c.id)} />
         ))}
       </div>
+      <BackupReminder family={family} />
       {child && (
         <AwardSheet
           open

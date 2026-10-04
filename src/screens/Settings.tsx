@@ -5,27 +5,12 @@ import { Sheet, Field, ErrorNote } from '../ui/controls';
 import { Avatar, AVATARS } from '../ui/Avatar';
 import { DownloadIcon, PencilIcon, UploadIcon } from '../ui/icons';
 import { errorMessage, updateChild, updateSettings } from '../db/operations';
-import { backupFileName, buildBackup, markBackedUp, parseBackup, restoreBackup, type BackupPreview } from '../db/backup';
+import { parseBackup, restoreBackup, type BackupPreview } from '../db/backup';
+import { backupResultMessage, saveBackupFile } from '../ui/backupAction';
 import { useFeedback } from '../ui/Feedback';
 import { formatDateTime } from '../ui/format';
 import { installApp, isIos, updateApp, usePwa } from '../pwa/pwa';
 import { plural } from '../domain/ledger';
-
-export async function downloadBackup(): Promise<number> {
-  const now = Date.now();
-  const backup = await buildBackup(now);
-  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = backupFileName(now);
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 10_000);
-  await markBackedUp(now);
-  return now;
-}
 
 export function Settings({ family }: { family: Family }) {
   const fb = useFeedback();
@@ -38,8 +23,8 @@ export function Settings({ family }: { family: Family }) {
 
   async function saveBackup() {
     try {
-      await downloadBackup();
-      fb.toast('Backup saved. Keep the file somewhere off this phone, such as your email or cloud storage.');
+      const msg = backupResultMessage(await saveBackupFile());
+      if (msg) fb.toast(msg);
     } catch {
       fb.toast('Could not create the backup—please try again.', { tone: 'error' });
     }
@@ -86,7 +71,7 @@ export function Settings({ family }: { family: Family }) {
       <section className="panel" aria-labelledby="set-backup">
         <h2 id="set-backup">Backup</h2>
         <p className="muted">
-          Stars are saved on this phone only. If the browser’s data is cleared or the phone is replaced, they can be lost. Save a backup file now and then.
+          Stars are saved on this phone only. If the browser’s data is cleared or the phone is replaced, they can be lost. Save a backup now and then and send it somewhere safe, such as WhatsApp to yourself.
         </p>
         <p className="small">
           Last backup: <strong>{settings.lastBackupAt ? formatDateTime(settings.lastBackupAt) : 'never'}</strong>
@@ -245,8 +230,7 @@ function RestoreSheet({ preview, onClose }: { preview: BackupPreview; onClose: (
 
   async function saveCurrentFirst() {
     try {
-      await downloadBackup();
-      setSavedCurrent(true);
+      if ((await saveBackupFile()) !== 'cancelled') setSavedCurrent(true);
     } catch {
       setError('Could not save the current data. You can still cancel.');
     }

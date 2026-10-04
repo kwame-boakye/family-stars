@@ -300,6 +300,11 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .update-box { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .update-banner { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 16px; background: #e7f0ff; font-weight: 600; flex-wrap: wrap; }
 
+/* ---------- Backup reminder ---------- */
+.reminder { background: #eef4ff; border: 2px solid #c9dbfb; border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.reminder h2 { font-size: 1.1rem; }
+.reminder .btn-row .btn { flex: 0 1 auto; }
+
 /* ---------- Setup ---------- */
 .setup { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 .setup-head { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 8px; }

@@ -75,6 +75,8 @@ export interface Settings {
   celebrations: boolean;
   setupDone: boolean;
   lastBackupAt?: number;
+  /** "Later" on the backup reminder hides it until this time. */
+  backupSnoozedUntil?: number;
 }
 
 export const SCHEMA_VERSION = 1;
